@@ -2,7 +2,7 @@
 import fire
 from ollama import chat
 from ollama import ChatResponse
-from .search_pmid import search_pubmed_by_term
+from search_pmid import search_pubmed_by_term
 import pandas as pd
 
 def summarize_article(abstract):
@@ -74,7 +74,7 @@ def rank_article_as_per_topic(abstract, topic, summarized_text):
     )
     return response.message.content 
 
-def summarize(topic, output_file="summarize_ranking.csv"):
+def summarize(topic, output_file=None):
     '''
     Search PubMed for articles related to a given topic, summarize each article's abstract,
     rank them based on relevance, and export the results to a CSV file.
@@ -115,21 +115,38 @@ def summarize(topic, output_file="summarize_ranking.csv"):
 
     The function also generates a file named ``output.csv`` with the same data.
     '''
+    from datetime import datetime
+    import os
+    os.makedirs("outputs", exist_ok=True)
+    if output_file is None:
+        output_file = f"outputs/summarize_ranking_{topic}_{datetime.now():%Y%m%d_%H%M%S}.csv"
+
     results = search_pubmed_by_term(topic)
     llm_summary_ranking = []
     for result in results:
-        summarized_text = summarize_article(result['abstract'])
-        rank = rank_article_as_per_topic(result['abstract'], topic, summarized_text)
-        llm_summary_ranking.append(
-            {
-                "abstract" : result['abstract'], 
-                "topic" : topic, 
-                "summary" : summarized_text, 
-                "rank" : rank 
-            }
-        )
+        try:
+            summarized_text = summarize_article(result.get('abstract', ''))
+            rank = rank_article_as_per_topic(result.get('abstract', ''), topic, summarized_text)
+        except Exception as e:
+            print(f"Error on PMID {result.get('pmid')}: {e}")
+            summarized_text, rank = None, None
 
+        llm_summary_ranking.append({
+            "pmid": result.get("pmid"),
+            "title": result.get("title"),
+            "abstract": result.get("abstract"),
+            "topic": topic,
+            "summary": summarized_text,
+            "rank": rank,
+        })
     # save to a csv file
     llm_summary_ranking_df = pd.DataFrame(llm_summary_ranking)
     llm_summary_ranking_df.to_csv(output_file)
     return llm_summary_ranking_df
+
+def main(topic):
+    summarize(topic)
+
+
+if __name__ == "__main__":
+    fire.Fire(main)
