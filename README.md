@@ -1,5 +1,4 @@
 ## 📚 literaturesearch
-
 A Python package that searches the PubMed for scientific articles, summarize abstracts, and ranks the abstracts with respect to topic of interest using LLM. 
 
 ## 🚀 Features
