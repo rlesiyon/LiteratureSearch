@@ -2,7 +2,7 @@
 import fire
 from ollama import chat
 from ollama import ChatResponse
-from search_pmid import search_pubmed_by_term
+from .search_pmid import search_pubmed_by_term
 import pandas as pd
 
 def summarize_article(abstract):
@@ -74,13 +74,15 @@ def rank_article_as_per_topic(abstract, topic, summarized_text):
     )
     return response.message.content 
 
-def summarize(topic):
+def summarize(topic, output_file="summarize_ranking.csv"):
     '''
     Search PubMed for articles related to a given topic, summarize each article's abstract,
     rank them based on relevance, and export the results to a CSV file.
 
     :param topic: The topic or search term to query in PubMed.
     :type topic: str
+    :param output_file: output file to store the summarization, and article ranking
+    :type output_file: str 
     :return: A pandas DataFrame containing the abstract, topic, summary, and relevance ranking for each article.
     :rtype: pandas.DataFrame
 
@@ -110,7 +112,7 @@ def summarize(topic):
         },
         ...
     ]
-    
+
     The function also generates a file named ``output.csv`` with the same data.
     '''
     results = search_pubmed_by_term(topic)
@@ -128,13 +130,6 @@ def summarize(topic):
         )
 
     # save to a csv file
-    print(llm_summary_ranking)
     llm_summary_ranking_df = pd.DataFrame(llm_summary_ranking)
-    llm_summary_ranking_df.to_csv("output.csv")
+    llm_summary_ranking_df.to_csv(output_file)
     return llm_summary_ranking_df
-
-def main(topic):
-    summarize(topic) 
-
-if __name__ == "__main__":
-    fire.Fire(main)

@@ -1,6 +1,3 @@
-
-# Function to search PMID using metapub given a particular term
-from metapub import PubMedFetcher
 import fire
 
 def search_pubmed_by_term(topic, retmax = 10):
@@ -14,6 +11,7 @@ def search_pubmed_by_term(topic, retmax = 10):
         list[dict]: A list of dictionaries, where each dictionary contains
                     the PMID, title, and abstract of an article.
     '''
+    from metapub import PubMedFetcher
     fetch = PubMedFetcher() 
     pmids = fetch.pmids_for_query(topic, retmax=retmax)
     fetched_articles = [ fetch_article(pmid) for pmid in pmids]
@@ -32,6 +30,7 @@ def fetch_article(pmid):
             - "title": The article’s title.
             - "abstract": The article’s abstract text.
     '''
+    from metapub import PubMedFetcher
     fetch = PubMedFetcher()
     article = fetch.article_by_pmid(pmid)
 
