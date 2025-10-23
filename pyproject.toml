@@ -1,0 +1,26 @@
+[project]
+name = "literaturesearch"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "rlesiyon",email = "lesiyonr@msu.edu"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<4.0.0"
+dependencies = [
+    "metapub (>=0.6.4,<0.7.0)",
+    "fire (>=0.7.1,<0.8.0)",
+    "langchain (>=1.0.2,<2.0.0)",
+    "deepagents (>=0.1.3,<0.2.0)",
+    "tavily-python (>=0.7.12,<0.8.0)",
+    "langchain-openai (>=1.0.1,<2.0.0)",
+    "langchain-tavily (>=0.2.12,<0.3.0)",
+    "ollama (>=0.6.0,<0.7.0)"
+]
+
+[tool.poetry]
+packages = [{include = "literaturesearch", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
